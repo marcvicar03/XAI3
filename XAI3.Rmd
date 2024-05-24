@@ -88,3 +88,138 @@ plot2 <- ggplot(days_since, aes(x = hum, y = output$hum)) + geom_line() + ylim(c
 subplot(plot1, plot2, shareY = TRUE, shareX = FALSE, titleX = TRUE)
 
 ```
+
+
+
+
+In the Temperature graph, a positive correlation between temperature and
+bicycle rentals is shown. This suggests that people prefer to rent 
+bicycles on days with pleasant temperatures. However, there is a decrease 
+in bicycle rentals when temperatures exceed 24º, likely due to a lack of 
+data for these temperatures, making this observation less significant.
+
+The Humidity graph shows a constant slope initially, which may be related 
+to a lack of data. Around 50% humidity, where data density increases, 
+bicycle rentals decrease, possibly because high humidity enhances the 
+thermal sensation.
+
+
+
+
+QUESTION:
+Interpret the results.
+
+```{r}
+sampled_data <- sample_n(days_since, 40)
+temperature <- sampled_data$temp
+humidity <- sampled_data$hum
+temp_hum_df <- inner_join(data.frame(temperature), data.frame(humidity), by = character())
+temp_hum_df$prediction <- 0
+
+for(index in 1:nrow(temp_hum_df)){
+  temp_data <- days_since
+  temp_data[["temp"]] <- temp_hum_df[["temperature"]][index]
+  temp_data[["hum"]] <- temp_hum_df[["humidity"]][index]
+  
+  prediction_values <- predict(rf_model, temp_data)$predicted
+  temp_hum_df[["prediction"]][index] <- sum(prediction_values) / num_rows
+}
+
+ggplot(temp_hum_df, aes(x = temperature, y = humidity)) +
+  geom_tile(aes(fill = prediction, width = 10, height = 15)) +
+  geom_rug(alpha = 0.01) +
+  xlab("Temperature") +
+  ylab("Humidity") +
+  scale_fill_gradient(name = "Number of bikes")
+```
+
+We can see similar trends to those depicted in the previous graphs. The 
+probability of renting bicycles is higher on days with warm temperatures 
+and low humidity, as these conditions are more appealing for using this 
+service. On the other hand, when temperatures are low and humidity is 
+high, the number of bicycle rentals decreases, which is understandable 
+given that these days are colder.
+
+The graph also indicates that bicycle usage declines at extreme 
+temperatures. However, it should be noted that there are no sampled 
+individuals at these extreme temperatures, so the outcome is based on a 
+predictive estimate.
+
+When temperatures fall below 15 degrees, we observe a sharp decline in 
+bicycle rentals, largely independent of humidity levels.
+
+
+EXERCISE:
+Apply the previous concepts to predict the price of a house from the 
+database kc_house_data.csv. In this case, use again a random forest 
+approximation for the prediction based on the features bedrooms, bathrooms, 
+sqft_living, sqft_lot, floors and yr_built. Use the partial
+dependence plot to visualize the relationships the model learned.
+
+BE CAREFUL: due to the size, extract a set of random samples from the BBDD 
+before generating the data for the Partial Dependency Plot.
+
+QUESTION:
+Analyse the influence of bedrooms, bathrooms, sqft_living and floors on 
+the predicted price.
+
+```{r}
+
+set.seed(100)
+
+data <- read.csv("kc_house_data.csv")
+
+sampled_data <- sample_n(data, 1000)
+
+sampled_data <- select(sampled_data, bedrooms, bathrooms, sqft_living, sqft_lot, floors, yr_built, price)
+
+rf_model <- rfsrc(price~., data=sampled_data)
+
+output <- select(sampled_data, bedrooms, bathrooms, sqft_living, floors, price)
+num_rows <- nrow(sampled_data)
+for(column in names(output)[1:4])
+{
+  for(index in 1:num_rows){
+    temp_data <- sampled_data
+    temp_data[[column]] <- sampled_data[[column]][index]
+    predictions <- predict(rf_model, temp_data)$predicted
+    output[[column]][index] <- sum(predictions) / num_rows
+  }
+}
+
+plot1 <- ggplot(sampled_data, aes(x = bedrooms, y = output$bedrooms)) + 
+  geom_line() + geom_rug(alpha = 0.1, sides = "b") + 
+  ylab("Prediction") + xlab("Bedrooms")
+
+plot2 <- ggplot(sampled_data, aes(x = bathrooms, y = output$bathrooms)) + 
+  geom_line() + geom_rug(alpha = 0.1, sides = "b") + 
+  xlab("Bathrooms")
+
+plot3 <- ggplot(sampled_data, aes(x = sqft_living, y = output$sqft_living)) + 
+  geom_line() + geom_rug(alpha = 0.1, sides = "b") + 
+  xlab("Sqft Living")
+
+plot4 <- ggplot(sampled_data, aes(x = floors, y = output$floors)) + 
+  geom_line() + geom_rug(alpha = 0.1, sides = "b") + 
+  xlab("Floors")
+
+subplot(plot1, plot2, plot3, plot4, shareX = FALSE, titleX = TRUE)
+
+```
+
+Firstly, it's worth noting an anomaly in the data: the categorical 
+variables "Bathrooms" and "Floors" are recorded with decimal values, 
+which seems odd given their categorical nature. With that observation 
+in mind, let's delve into how these variables influence the prediction 
+of housing prices.
+
+Interestingly, the model's predictions suggest that houses with 3, 4, 
+or 5 bedrooms are valued lower than those with 1 or 2 bedrooms, 
+which seems counterintuitive. This raises the question of whether 
+this discrepancy is an error in the model or a unique characteristic of houses in the area, warranting further investigation.
+
+Regarding the number of bathrooms, most properties fall within the range of 1 to 4 bathrooms. Within this range, the model indicates a positive correlation between the number of bathrooms and the predicted price of the house, which aligns with real-world expectations. However, it's important to note that the price variation within this range isn't substantial, suggesting that other factors may also influence price.
+
+Analyzing the square footage variable, we find that the model primarily trained on data ranging from 500 to 4000 square feet. Here, a clear positive relationship emerges between square footage and price prediction – larger square footage generally corresponds to higher predicted prices.
+
+Lastly, there's a noticeable upward trend between the number of floors and the price of the house. The most significant price differences are observed when comparing houses with 2 floors to those with 3, indicating that additional floors command higher prices.
