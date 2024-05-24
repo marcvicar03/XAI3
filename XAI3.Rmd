@@ -80,7 +80,7 @@ avoid holes.
 plot1 <- ggplot(days_since, aes(x = temp, y = output$temp)) + geom_line() + ylim(c(0,6000)) +
   geom_rug(alpha = 0.1, sides = "b") + xlab("Temperature")
 
-plot3 <- ggplot(days_since, aes(x = hum, y = output$hum)) + geom_line() + ylim(c(0,6000)) +
+plot2 <- ggplot(days_since, aes(x = hum, y = output$hum)) + geom_line() + ylim(c(0,6000)) +
   geom_rug(alpha = 0.1, sides = "b") + xlab("Humidity")
 
 
