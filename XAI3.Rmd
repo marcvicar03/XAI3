@@ -216,10 +216,24 @@ of housing prices.
 Interestingly, the model's predictions suggest that houses with 3, 4, 
 or 5 bedrooms are valued lower than those with 1 or 2 bedrooms, 
 which seems counterintuitive. This raises the question of whether 
-this discrepancy is an error in the model or a unique characteristic of houses in the area, warranting further investigation.
+this discrepancy is an error in the model or a unique characteristic 
+of houses in the area, warranting further investigation.
 
-Regarding the number of bathrooms, most properties fall within the range of 1 to 4 bathrooms. Within this range, the model indicates a positive correlation between the number of bathrooms and the predicted price of the house, which aligns with real-world expectations. However, it's important to note that the price variation within this range isn't substantial, suggesting that other factors may also influence price.
+Regarding the number of bathrooms, most properties fall within the 
+range of 1 to 4 bathrooms. Within this range, the model indicates a 
+positive correlation between the number of bathrooms and the predicted 
+price of the house, which aligns with real-world expectations. 
+However, it's important to note that the price variation within this 
+range isn't substantial, suggesting that other factors may also influence 
+price.
 
-Analyzing the square footage variable, we find that the model primarily trained on data ranging from 500 to 4000 square feet. Here, a clear positive relationship emerges between square footage and price prediction – larger square footage generally corresponds to higher predicted prices.
+Analyzing the square footage variable, we find that the model primarily 
+trained on data ranging from 500 to 4000 square feet. Here, a clear 
+positive relationship emerges between square footage and price 
+prediction – larger square footage generally corresponds to higher 
+predicted prices.
 
-Lastly, there's a noticeable upward trend between the number of floors and the price of the house. The most significant price differences are observed when comparing houses with 2 floors to those with 3, indicating that additional floors command higher prices.
+Lastly, there's a noticeable upward trend between the number of floors 
+and the price of the house. The most significant price differences are 
+observed when comparing houses with 2 floors to those with 3, indicating 
+that additional floors command higher prices.
