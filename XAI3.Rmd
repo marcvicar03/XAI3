@@ -33,3 +33,21 @@ days_since$hum <- days_since$hum * 100
 days_since$windspeed <- days_since$windspeed * 67
 
 ```
+
+
+```{r we create the rf model and analyse the influence of days since 2011, temperature, humidity and wind speed on the predicted bike counts.}
+rf_model <- rfsrc(cnt~., data=days_since)
+
+output <- select(days_since, days_since_2011, temp, hum, windspeed, cnt)
+num_rows <- nrow(days_since)
+for(column in names(output)[1:4])
+{
+  for(index in 1:num_rows){
+    temp_data <- days_since
+    temp_data[[column]] <- days_since[[column]][index]
+    prediction <- predict(rf_model, temp_data)$predicted
+    output[[column]][index] <- sum(prediction) / num_rows
+  }
+}
+
+```
