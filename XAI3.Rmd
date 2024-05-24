@@ -15,6 +15,16 @@ library(randomForestSRC)
 
 ```
 
+EXERCISE:
+Apply PDP to the regression example of predicting bike rentals. Fit a random 
+forest approximation for the prediction of bike rentals (cnt). Use the partial 
+dependence plot to visualize the relationships the model learned. Use the slides 
+shown in class as model.
+
+QUESTION:
+Analyse the influence of days since 2011, temperature, humidity and wind 
+speed on the predicted bike counts.
+
 ```{r carga y transformación de datos para aplicar el modelo de random forest}
 
 days <- read.csv("day.csv")
@@ -49,5 +59,32 @@ for(column in names(output)[1:4])
     output[[column]][index] <- sum(prediction) / num_rows
   }
 }
+
+```
+
+EXERCISE:
+Generate a 2D Partial Dependency Plot with humidity and temperature to 
+predict the number of bikes rented depending of those parameters.
+
+BE CAREFUL: due to the size, extract a set of random samples from the BBDD 
+before generating the the data for the Partial Dependency Plot.
+
+Show the density distribution of both input features with the 2D plot as 
+shown in the class slides.
+
+TIP: Use geom_tile() to generate the 2D plot. Set width and height to 
+avoid holes.
+
+```{r generate graphs}
+
+plot1 <- ggplot(days_since, aes(x = temp, y = output$temp)) + geom_line() + ylim(c(0,6000)) +
+  geom_rug(alpha = 0.1, sides = "b") + xlab("Temperature")
+
+plot3 <- ggplot(days_since, aes(x = hum, y = output$hum)) + geom_line() + ylim(c(0,6000)) +
+  geom_rug(alpha = 0.1, sides = "b") + xlab("Humidity")
+
+
+# Usar subplot de plotly para organizar los gráficos
+subplot(plot1, plot2, shareY = TRUE, shareX = FALSE, titleX = TRUE)
 
 ```
